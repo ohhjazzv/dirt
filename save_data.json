@@ -1,0 +1,18 @@
+{
+  "day": 1,
+  "coins": 7,
+  "weather": "sunny",
+  "plots": [
+    {
+      "crop": "wheat",
+      "age": 0,
+      "days_needed": 3,
+      "ready": false
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+  ]
+}
