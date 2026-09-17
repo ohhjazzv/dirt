@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import fakefarm as farm
 
 
@@ -61,3 +62,6 @@ while True:
         do_plant(state)
     else:
         print("not built yet")
+=======
+
+>>>>>>> 3f1e1a44b4946dd8e19af442db5882c4d25b9649
