@@ -36,18 +36,42 @@ def ask_for_plot():
     return plot_number
 
 
+def do_shop():
+    print("")
+    print("seeds you can plant:")
+    for name in farm.CROPS:
+        crop = farm.CROPS[name]
+        print(" ", name, "- costs", crop["cost"], "- sells for", crop["sell"], "- takes", crop["days"], "days")
+
+
 def do_plant(state):
     plot_number = ask_for_plot()
     if plot_number is None:
         return
 
-    seed = input("which seed? ")
-    worked = farm.plant(plot_number - 1, seed)
+    names = list(farm.CROPS)
 
-    if worked:
-        print("planted", seed)
-    else:
-        print("could not plant", seed)
+    print("")
+    for n in range(len(names)):
+        crop = farm.CROPS[names[n]]
+        print(" ", n + 1, ")", names[n], "-", crop["cost"], "coins")
+
+    seed_text = input("which seed? ")
+
+    if not seed_text.isdigit():
+        print("that's not a number gng")
+        return
+
+    seed_number = int(seed_text)
+
+    if seed_number < 1 or seed_number > len(names):
+        print("pick 1 to " + str(len(names)))
+        return
+
+    seed = names[seed_number - 1]
+
+    result = farm.plant(plot_number, seed)
+    print(result["message"])
 
 
 def do_harvest(state):
@@ -55,18 +79,14 @@ def do_harvest(state):
     if plot_number is None:
         return
 
-    coins = farm.harvest(plot_number - 1)
-
-    if coins > 0:
-        print("harvested for", coins, "coins")
-    else:
-        print("nothing ready there")
+    result = farm.harvest(plot_number)
+    print(result["message"])
 
 
 while True:
     state = farm.get_state()
     print("")
-    print("Day", state["day"], "· Coins:", state["coins"])
+    print("Day", state["day"], "· Coins:", state["coins"], "·", state["weather"])
     draw_field(state)
     print("")
     print("1) plant  2) harvest  3) shop  4) next day  5) quit")
@@ -75,12 +95,15 @@ while True:
     if choice == "5":
         print("bye")
         break
-    elif choice == "4":
-        farm.advance_day()
-        print("a day passes.......")
     elif choice == "1":
         do_plant(state)
     elif choice == "2":
         do_harvest(state)
+    elif choice == "3":
+        do_shop()
+    elif choice == "4":
+        result = farm.advance_day()
+        print(result["message"])
     else:
         print("not built yet")
+        
