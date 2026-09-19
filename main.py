@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import fakefarm as farm
 
 
@@ -21,17 +20,25 @@ def draw_field(state):
         print(line)
 
 
-def do_plant(state):
+def ask_for_plot():
     plot_text = input("which plot (1-6)? ")
 
     if not plot_text.isdigit():
         print("that's not a number gng")
-        return
+        return None
 
     plot_number = int(plot_text)
 
     if plot_number < 1 or plot_number > 6:
         print("plot must be 1 to 6")
+        return None
+
+    return plot_number
+
+
+def do_plant(state):
+    plot_number = ask_for_plot()
+    if plot_number is None:
         return
 
     seed = input("which seed? ")
@@ -41,6 +48,19 @@ def do_plant(state):
         print("planted", seed)
     else:
         print("could not plant", seed)
+
+
+def do_harvest(state):
+    plot_number = ask_for_plot()
+    if plot_number is None:
+        return
+
+    coins = farm.harvest(plot_number - 1)
+
+    if coins > 0:
+        print("harvested for", coins, "coins")
+    else:
+        print("nothing ready there")
 
 
 while True:
@@ -60,8 +80,7 @@ while True:
         print("a day passes.......")
     elif choice == "1":
         do_plant(state)
+    elif choice == "2":
+        do_harvest(state)
     else:
         print("not built yet")
-=======
-
->>>>>>> 3f1e1a44b4946dd8e19af442db5882c4d25b9649
