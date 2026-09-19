@@ -1,23 +1,45 @@
+import os
+
 import fakefarm as farm
+
+
+def clear():
+    os.system("cls" if os.name == "nt" else "clear")
 
 
 def symbol_for(plot):
     if plot is None:
-        return "."
+        return " .  "
     elif plot["ready"]:
-        return "♣"
+        return plot["crop"][0].upper() + "!  "
     else:
-        return ","
+        left = plot["days_needed"] - plot["age"]
+        return plot["crop"][0].lower() + str(left) + "  "
+
+
+def bar_for(plot):
+    if plot is None:
+        return "          "
+    width = 8
+    filled = int(plot["age"] / plot["days_needed"] * width)
+    if filled > width:
+        filled = width
+    empty = width - filled
+    return "[" + ("#" * filled) + (" " * empty) + "]"
 
 
 def draw_field(state):
     plots = state["plots"]
     for row in range(2):
-        line = ""
+        top = ""
+        bottom = ""
         for col in range(3):
             i = row * 3 + col
-            line = line + "  [" + str(i + 1) + "] " + symbol_for(plots[i])
-        print(line)
+            top = top + "  [" + str(i + 1) + "] " + symbol_for(plots[i])
+            bottom = bottom + "      " + bar_for(plots[i]) + " "
+        print(top)
+        print(bottom)
+        print("")
 
 
 def ask_for_plot():
@@ -42,6 +64,7 @@ def do_shop():
     for name in farm.CROPS:
         crop = farm.CROPS[name]
         print(" ", name, "- costs", crop["cost"], "- sells for", crop["sell"], "- takes", crop["days"], "days")
+    input("press enter ")
 
 
 def do_plant(state):
@@ -72,6 +95,7 @@ def do_plant(state):
 
     result = farm.plant(plot_number, seed)
     print(result["message"])
+    input("press enter ")
 
 
 def do_harvest(state):
@@ -81,20 +105,24 @@ def do_harvest(state):
 
     result = farm.harvest(plot_number)
     print(result["message"])
+    input("press enter ")
 
 
 while True:
+    clear()
     state = farm.get_state()
     print("")
     print("Day", state["day"], "· Coins:", state["coins"], "·", state["weather"])
-    draw_field(state)
     print("")
+    draw_field(state)
     print("1) plant  2) harvest  3) shop  4) next day  5) quit")
     choice = input("> ")
 
     if choice == "5":
         print("bye")
         break
+    elif choice == "":
+        pass
     elif choice == "1":
         do_plant(state)
     elif choice == "2":
@@ -104,6 +132,6 @@ while True:
     elif choice == "4":
         result = farm.advance_day()
         print(result["message"])
+        input("press enter ")
     else:
         print("not built yet")
-        
