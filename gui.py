@@ -1,5 +1,7 @@
+import random
+
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import ttk, messagebox
 
 import farm_1 as farm
 
@@ -30,6 +32,15 @@ WEATHER_INFO = {
     "storm": {"icon": "\u26C8", "label": "Storm", "desc": "crops may be destroyed today."},
 }
 
+STAT_ROWS = [
+    ("total_earned", "Total coins earned"),
+    ("total_planted", "Seeds planted"),
+    ("total_harvested", "Crops harvested"),
+    ("best_single_sale", "Best single sale"),
+    ("storms_faced", "Storms faced"),
+    ("plants_lost", "Crops lost to storms"),
+]
+
 PLOT_W, PLOT_H = 150, 150
 BAR_W, BAR_H = 110, 10
 
@@ -46,6 +57,8 @@ class FarmGUI:
         self.plot_icons = []
         self.plot_labels = []
         self.plot_bars = []
+        self.stat_value_labels = {}
+        self.achievement_labels = {}
 
         self._build_splash_screen()
 
@@ -90,16 +103,7 @@ class FarmGUI:
         self.splash.destroy()
         self._build_menu_bar()
         self._build_title()
-        self._build_status_bar()
-        self._build_weather_banner()
-
-        body = tk.Frame(self.root, bg=BG_MAIN)
-        body.pack(fill="both", expand=True)
-        self._build_farm_grid(body)
-        self._build_shop_panel(body)
-
-        self._build_log()
-        self._build_action_buttons()
+        self._build_notebook()
         self.refresh()
 
     def confirm_quit(self):
@@ -131,8 +135,37 @@ class FarmGUI:
         )
         title.pack(fill="x")
 
-    def _build_status_bar(self):
-        bar = tk.Frame(self.root, bg=BG_STATUSBAR, pady=10)
+    def _build_notebook(self):
+        style = ttk.Style()
+        style.configure("TNotebook", background=BG_MAIN)
+        style.configure("TNotebook.Tab", font=FONT_BODY, padding=(14, 6))
+
+        notebook = ttk.Notebook(self.root)
+        notebook.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+
+        farm_tab = tk.Frame(notebook, bg=BG_MAIN)
+        stats_tab = tk.Frame(notebook, bg=BG_MAIN)
+
+        notebook.add(farm_tab, text="Farm")
+        notebook.add(stats_tab, text="Stats & Achievements")
+
+        self._build_farm_tab(farm_tab)
+        self._build_stats_tab(stats_tab)
+
+    def _build_farm_tab(self, parent):
+        self._build_status_bar(parent)
+        self._build_weather_banner(parent)
+
+        body = tk.Frame(parent, bg=BG_MAIN)
+        body.pack(fill="both", expand=True)
+        self._build_farm_grid(body)
+        self._build_shop_panel(body)
+
+        self._build_log(parent)
+        self._build_action_buttons(parent)
+
+    def _build_status_bar(self, parent):
+        bar = tk.Frame(parent, bg=BG_STATUSBAR, pady=10)
         bar.pack(fill="x")
 
         self.day_label = tk.Label(bar, text="", font=FONT_HEADER, bg=BG_STATUSBAR, fg="white")
@@ -141,8 +174,8 @@ class FarmGUI:
         self.coins_label = tk.Label(bar, text="", font=FONT_HEADER, bg=BG_STATUSBAR, fg="#ffd54f")
         self.coins_label.pack(side="left", padx=20)
 
-    def _build_weather_banner(self):
-        banner = tk.Frame(self.root, bg=BG_PANEL, pady=6)
+    def _build_weather_banner(self, parent):
+        banner = tk.Frame(parent, bg=BG_PANEL, pady=6)
         banner.pack(fill="x", pady=(8, 4), padx=2)
 
         self.weather_label = tk.Label(
@@ -221,15 +254,15 @@ class FarmGUI:
             font=("Arial", 9, "italic"), bg=BG_PANEL, justify="left",
         ).pack(anchor="w", pady=(14, 0))
 
-    def _build_log(self):
+    def _build_log(self, parent):
         self.log = tk.Text(
-            self.root, height=6, bg=BG_LOG, fg=FG_LOG,
+            parent, height=6, bg=BG_LOG, fg=FG_LOG,
             font=FONT_MONO, bd=0, state="disabled", wrap="word",
         )
         self.log.pack(fill="x", padx=12, pady=(4, 0))
 
-    def _build_action_buttons(self):
-        row = tk.Frame(self.root, bg=BG_MAIN)
+    def _build_action_buttons(self, parent):
+        row = tk.Frame(parent, bg=BG_MAIN)
         row.pack(pady=10)
 
         harvest_all_btn = tk.Button(
@@ -246,6 +279,57 @@ class FarmGUI:
             command=self.on_next_day,
         )
         next_day_btn.pack(side="left")
+
+    # ------------------------------------------------------------------
+    # stats tab
+    # ------------------------------------------------------------------
+
+    def _build_stats_tab(self, parent):
+        columns = tk.Frame(parent, bg=BG_MAIN)
+        columns.pack(fill="both", expand=True, padx=10, pady=10)
+
+        self._build_stats_panel(columns)
+        self._build_achievements_panel(columns)
+
+    def _build_stats_panel(self, parent):
+        panel = tk.Frame(parent, bg=BG_PANEL, bd=2, relief="groove", padx=16, pady=16)
+        panel.pack(side="left", fill="both", expand=True, padx=(0, 8))
+
+        tk.Label(panel, text="Lifetime Stats", font=FONT_HEADER, bg=BG_PANEL).pack(
+            anchor="w", pady=(0, 12)
+        )
+
+        for key, label_text in STAT_ROWS:
+            row = tk.Frame(panel, bg=BG_PANEL)
+            row.pack(fill="x", pady=4)
+
+            tk.Label(
+                row, text=label_text, font=FONT_BODY, bg=BG_PANEL, anchor="w", width=20
+            ).pack(side="left")
+
+            value_label = tk.Label(
+                row, text="0", font=("Arial", 10, "bold"), bg=BG_PANEL, anchor="e"
+            )
+            value_label.pack(side="left")
+            self.stat_value_labels[key] = value_label
+
+    def _build_achievements_panel(self, parent):
+        panel = tk.Frame(parent, bg=BG_PANEL, bd=2, relief="groove", padx=16, pady=16)
+        panel.pack(side="left", fill="both", expand=True, padx=(8, 0))
+
+        tk.Label(panel, text="Achievements", font=FONT_HEADER, bg=BG_PANEL).pack(
+            anchor="w", pady=(0, 12)
+        )
+
+        for name in farm.get_state()["achievements"]:
+            row = tk.Frame(panel, bg=BG_PANEL)
+            row.pack(fill="x", pady=3, anchor="w")
+
+            lbl = tk.Label(
+                row, text="\U0001F512  " + name, font=FONT_BODY, bg=BG_PANEL, anchor="w"
+            )
+            lbl.pack(anchor="w")
+            self.achievement_labels[name] = lbl
 
     # ------------------------------------------------------------------
     # dialogs
@@ -341,6 +425,18 @@ class FarmGUI:
             bar.config(bg=color)
             frame.config(bg=color)
 
+        stats = state["stats"]
+        for key in self.stat_value_labels:
+            self.stat_value_labels[key].config(text=str(stats[key]))
+
+        achievements = state["achievements"]
+        for name in self.achievement_labels:
+            lbl = self.achievement_labels[name]
+            if achievements.get(name):
+                lbl.config(text="\u2705  " + name, fg="#2e7d32")
+            else:
+                lbl.config(text="\U0001F512  " + name, fg="#999999")
+
     # ------------------------------------------------------------------
     # handlers — these call farm_1 and nothing else
     # ------------------------------------------------------------------
@@ -357,6 +453,8 @@ class FarmGUI:
             result = farm.harvest(plot_number)
             self.say(result["message"], "info" if result["ok"] else "bad")
             self.refresh()
+            if result["ok"]:
+                self.confetti()
 
         else:
             left = entry["days_needed"] - entry["age"]
@@ -418,7 +516,11 @@ class FarmGUI:
 
         self.refresh()
 
+        if harvested > 0:
+            self.confetti()
+
     def on_next_day(self):
+        before = farm.get_state()["achievements"]
         result = farm.advance_day()
         state = farm.get_state()
 
@@ -428,6 +530,11 @@ class FarmGUI:
         for event in result["events"]:
             self.say(event, "bad")
 
+        after = state["achievements"]
+        for name in after:
+            if after[name] and not before.get(name):
+                self.say("achievement unlocked: " + name, "warn")
+
         self.refresh()
 
 
@@ -435,6 +542,4 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = FarmGUI(root)
     root.mainloop()
-
-
 

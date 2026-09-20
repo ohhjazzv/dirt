@@ -1,28 +1,31 @@
 {
-  "day": 3,
-  "coins": 1,
+  "day": 6,
+  "coins": 9,
   "weather": "sunny",
   "plots": [
     {
       "crop": "wheat",
-      "age": 2,
+      "age": 5,
       "days_needed": 3,
-      "ready": false
+      "ready": true
     },
+    null,
     {
       "crop": "Wheat",
-      "age": 2,
+      "age": 5,
       "days_needed": 3,
-      "ready": false
-    },
-    {
-      "crop": "Wheat",
-      "age": 2,
-      "days_needed": 3,
-      "ready": false
+      "ready": true
     },
     null,
     null,
     null
-  ]
+  ],
+  "stats": {
+    "total_earned": 8,
+    "total_planted": 0,
+    "total_harvested": 1,
+    "best_single_sale": 8,
+    "storms_faced": 0,
+    "plants_lost": 0
+  }
 }

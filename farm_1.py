@@ -24,6 +24,14 @@ def _fresh_state():
         "coins": START_COINS,
         "weather": "sunny",
         "plots": [None] * PLOTS,
+        "stats": {
+            "total_earned": 0,
+            "total_planted": 0,
+            "total_harvested": 0,
+            "best_single_sale": 0,
+            "storms_faced": 0,
+            "plants_lost": 0,
+        },
     }
 
 
@@ -42,6 +50,9 @@ def _load():
     else:
         _state = _fresh_state()
 
+    if "stats" not in _state:
+        _state["stats"] = _fresh_state()["stats"]
+
 
 def _save():
     with open(_SAVE_PATH, "w") as f:
@@ -57,6 +68,19 @@ def _plot_index(plot):
 
 def _is_ready(entry):
     return entry is not None and entry["age"] >= entry["days_needed"]
+
+
+def _compute_achievements():
+    s = _state["stats"]
+    return {
+        "First Harvest": s["total_harvested"] >= 1,
+        "Green Thumb": s["total_planted"] >= 10,
+        "High Roller": s["best_single_sale"] >= 65,
+        "Farm Tycoon": s["total_earned"] >= 500,
+        "Storm Survivor": s["storms_faced"] >= 5,
+        "Untouchable": s["storms_faced"] >= 3 and s["plants_lost"] == 0,
+        "Century Farmer": _state["day"] >= 100,
+    }
 
 
 def plant(plot, seed):
@@ -80,6 +104,7 @@ def plant(plot, seed):
         "days_needed": SHOP[seed]["days"],
         "ready": False,
     }
+    _state["stats"]["total_planted"] += 1
     _save()
     return {"ok": True, "message": f"planted {seed} in plot {plot}."}
 
@@ -99,6 +124,12 @@ def harvest(plot):
     payout = SHOP[entry["crop"]]["sell"]
     _state["coins"] += payout
     _state["plots"][idx] = None
+
+    _state["stats"]["total_earned"] += payout
+    _state["stats"]["total_harvested"] += 1
+    if payout > _state["stats"]["best_single_sale"]:
+        _state["stats"]["best_single_sale"] = payout
+
     _save()
     return {"ok": True, "message": f"sold {entry['crop']} from plot {plot} for {payout}."}
 
@@ -110,6 +141,9 @@ def advance_day():
     weather = random.choices(WEATHER_CHOICES, weights=WEATHER_WEIGHTS, k=1)[0]
     _state["weather"] = weather
 
+    if weather == "storm":
+        _state["stats"]["storms_faced"] += 1
+
     for i, entry in enumerate(_state["plots"]):
         if entry is None:
             continue
@@ -118,6 +152,7 @@ def advance_day():
             if random.random() < risk:
                 events.append(f"storm destroyed the {entry['crop']} in plot {i + 1}.")
                 _state["plots"][i] = None
+                _state["stats"]["plants_lost"] += 1
                 continue
         entry["age"] += 1
         entry["ready"] = entry["age"] >= entry["days_needed"]
@@ -139,4 +174,6 @@ def get_state():
         "weather": _state["weather"],
         "plots": [None if p is None else dict(p) for p in _state["plots"]],
         "shop": {k: dict(v) for k, v in SHOP.items()},
+        "stats": dict(_state["stats"]),
+        "achievements": _compute_achievements(),
     }
