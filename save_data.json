@@ -1,16 +1,26 @@
 {
-  "day": 1,
-  "coins": 7,
+  "day": 3,
+  "coins": 1,
   "weather": "sunny",
   "plots": [
     {
       "crop": "wheat",
-      "age": 0,
+      "age": 2,
       "days_needed": 3,
       "ready": false
     },
-    null,
-    null,
+    {
+      "crop": "Wheat",
+      "age": 2,
+      "days_needed": 3,
+      "ready": false
+    },
+    {
+      "crop": "Wheat",
+      "age": 2,
+      "days_needed": 3,
+      "ready": false
+    },
     null,
     null,
     null
