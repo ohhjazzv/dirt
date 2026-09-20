@@ -1,6 +1,6 @@
 import os
 
-import fakefarm as farm
+import farm_1 as farm
 
 
 def clear():
@@ -61,8 +61,8 @@ def ask_for_plot():
 def do_shop():
     print("")
     print("seeds you can plant:")
-    for name in farm.CROPS:
-        crop = farm.CROPS[name]
+    for name in farm.SHOP:
+        crop = farm.SHOP[name]
         print(" ", name, "- costs", crop["cost"], "- sells for", crop["sell"], "- takes", crop["days"], "days")
     input("press enter ")
 
@@ -72,11 +72,11 @@ def do_plant(state):
     if plot_number is None:
         return
 
-    names = list(farm.CROPS)
+    names = list(farm.SHOP)
 
     print("")
     for n in range(len(names)):
-        crop = farm.CROPS[names[n]]
+        crop = farm.SHOP[names[n]]
         print(" ", n + 1, ")", names[n], "-", crop["cost"], "coins")
 
     seed_text = input("which seed? ")
