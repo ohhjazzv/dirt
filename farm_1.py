@@ -53,10 +53,27 @@ def _load():
     if "stats" not in _state:
         _state["stats"] = _fresh_state()["stats"]
 
+    for i, entry in enumerate(_state["plots"]):
+        if entry is None:
+            continue
+        real = _match_seed(entry.get("crop", ""))
+        if real is None:
+            _state["plots"][i] = None
+        else:
+            entry["crop"] = real
+
 
 def _save():
     with open(_SAVE_PATH, "w") as f:
         json.dump(_state, f, indent=2)
+
+
+def _match_seed(seed):
+    """Find the real SHOP key for a seed name, ignoring case. None if no match."""
+    for name in SHOP:
+        if name.lower() == str(seed).lower():
+            return name
+    return None
 
 
 def _plot_index(plot):
@@ -88,8 +105,12 @@ def plant(plot, seed):
     idx = _plot_index(plot)
     if idx is None:
         return {"ok": False, "message": f"plot must be 1-{PLOTS}."}
-    if seed not in SHOP:
+
+    real_seed = _match_seed(seed)
+    if real_seed is None:
         return {"ok": False, "message": f"no such seed: {seed}"}
+    seed = real_seed
+
     if _state["plots"][idx] is not None:
         return {"ok": False, "message": f"plot {plot} is already planted."}
 
@@ -114,9 +135,16 @@ def harvest(plot):
     idx = _plot_index(plot)
     if idx is None:
         return {"ok": False, "message": f"plot must be 1-{PLOTS}."}
+
     entry = _state["plots"][idx]
     if entry is None:
         return {"ok": False, "message": f"plot {plot} is empty"}
+
+    if entry["crop"] not in SHOP:
+        _state["plots"][idx] = None
+        _save()
+        return {"ok": False, "message": f"plot {plot} had a bad crop, cleared it."}
+
     if not _is_ready(entry):
         left = entry["days_needed"] - entry["age"]
         return {"ok": False, "message": f"plot {plot} needs {left} more day(s)."}
