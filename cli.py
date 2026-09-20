@@ -318,5 +318,5 @@ except (UnicodeDecodeError, LookupError):
     if __name__ == "__main__":
         try: 
             main()
-            except (EOFError, KeyboardInterrupt):
-                print(c("\n bye.", DIM))
+        except (EOFError, KeyboardInterrupt):
+            print(c("\n bye", DIM))
