@@ -1,26 +1,21 @@
 {
-  "day": 6,
-  "coins": 5,
-  "weather": "sunny",
+  "day": 15,
+  "coins": 70,
+  "weather": "storm",
   "plots": [
     null,
-    {
-      "crop": "Melon",
-      "age": 0,
-      "days_needed": 8,
-      "ready": false
-    },
+    null,
     null,
     null,
     null,
     null
   ],
   "stats": {
-    "total_earned": 24,
+    "total_earned": 89,
     "total_planted": 1,
-    "total_harvested": 3,
-    "best_single_sale": 8,
-    "storms_faced": 0,
+    "total_harvested": 4,
+    "best_single_sale": 65,
+    "storms_faced": 2,
     "plants_lost": 0
   }
 }
