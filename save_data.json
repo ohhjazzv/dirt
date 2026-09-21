@@ -1,21 +1,26 @@
 {
-  "day": 15,
-  "coins": 70,
-  "weather": "storm",
+  "day": 24,
+  "coins": 67,
+  "weather": "sunny",
   "plots": [
     null,
-    null,
+    {
+      "crop": "Chili",
+      "age": 9,
+      "days_needed": 5,
+      "ready": true
+    },
     null,
     null,
     null,
     null
   ],
   "stats": {
-    "total_earned": 89,
-    "total_planted": 1,
-    "total_harvested": 4,
+    "total_earned": 97,
+    "total_planted": 3,
+    "total_harvested": 5,
     "best_single_sale": 65,
-    "storms_faced": 2,
+    "storms_faced": 3,
     "plants_lost": 0
   }
 }

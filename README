@@ -4,7 +4,7 @@ dirt is a farming game that runs in your terminal. you plant stuff, wait for it 
 
 ## running it
 
-you need python 3 and nothing else, no dependencies. `python main.py` for the terminal version, `python gui.py` for the window version. same game underneath, two ways of looking at it.
+you need python 3 and nothing else, no dependencies. `python main.py` for the terminal version, `python gui.py` for the window version. same thing just two ways
 
 ## how it plays
 

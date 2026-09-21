@@ -19,7 +19,7 @@ def symbol_for(plot):
 
 def bar_for(plot):
     if plot is None:
-        return "          "
+        return ""
     width = 8
     filled = int(plot["age"] / plot["days_needed"] * width)
     if filled > width:
@@ -31,12 +31,12 @@ def bar_for(plot):
 def draw_field(state):
     plots = state["plots"]
     for row in range(2):
-        top = ""
-        bottom = ""
+        top = "  "
+        bottom = "  "
         for col in range(3):
             i = row * 3 + col
-            top = top + "  [" + str(i + 1) + "] " + symbol_for(plots[i])
-            bottom = bottom + "      " + bar_for(plots[i]) + " "
+            top = top + ("[" + str(i + 1) + "] " + symbol_for(plots[i])).ljust(14)
+            bottom = bottom + bar_for(plots[i]).ljust(14)
         print(top)
         print(bottom)
         print("")
